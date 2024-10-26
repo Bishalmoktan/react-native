@@ -5,19 +5,49 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "../../constants";
 import FormField from "@/components/form-field";
 import { useState } from "react";
 import CustomButton from "@/components/custom-button";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+import { signIn } from "@/lib/appWrite";
 
 const SignIn = () => {
   const [formState, setFormState] = useState({
     email: "",
     password: "",
   });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const onSumbit = async () => {
+      if (!formState.email  || !formState.password) {
+        Alert.alert("Error", "Fill all the fields");
+        return;
+      }
+      setIsSubmitting(true);
+      try {
+        await signIn(
+          formState.email,
+          formState.password
+        );
+
+        // set global state
+
+        router.replace("/home");
+      } catch (error) {
+        console.log(error);
+        if (error instanceof Error) {
+          Alert.alert("Error", error.message);
+        } else {
+          Alert.alert("Error", "Something went wrong!");
+        }
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
 
   return (
     <SafeAreaView className="h-full bg-primary">
@@ -61,9 +91,9 @@ const SignIn = () => {
 
             <CustomButton
               title="Sign In"
-              handlePress={() => {}}
+              handlePress={onSumbit}
               containerStyles="mt-7 w-full"
-              loading={false}
+              loading={isSubmitting}
             />
 
             <View className="flex-row justify-center gap-2 pt-5">
