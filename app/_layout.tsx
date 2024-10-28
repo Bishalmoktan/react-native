@@ -4,6 +4,7 @@ import { StyleSheet } from "react-native";
 import "../global.css";
 import { useEffect } from "react";
 import GlobalProvider from "@/context/global-context";
+import { StatusBar } from "expo-status-bar";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -59,6 +60,7 @@ const RootLayout = () => {
           }}
         ></Stack.Screen>
       </Stack>
+      <StatusBar backgroundColor="#161622" style="light" />
     </GlobalProvider>
   );
 };

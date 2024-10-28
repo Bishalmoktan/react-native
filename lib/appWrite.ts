@@ -17,6 +17,16 @@ export const config = {
   storageId: "671cb085000ed62d72d3",
 };
 
+const {
+  endpoint,
+  platform,
+  projectId,
+  databaseId,
+  userCollectionId,
+  videoCollectionId,
+  storageId,
+} = config;
+
 const client = new Client();
 const account = new Account(client);
 const avatars = new Avatars(client);
@@ -95,3 +105,12 @@ export const getCurrentUser = async () => {
     throw error;
   }
 };
+
+export const getAllVideos = async () => {
+  const videos = await databases.listDocuments(
+    databaseId,
+    videoCollectionId
+  )
+
+  return videos.documents;
+}
