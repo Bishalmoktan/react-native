@@ -13,11 +13,10 @@ import { Videos } from "@/types";
 
 const Home = () => {
   const [refreshing, setRefreshing] = useState(false);
-  const { data: posts, loading, refetch } = useAppwrite(getAllVideos);
+  const { data: posts, refetch } = useAppwrite(getAllVideos);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    // recall the videos (fetch)
     await refetch();
     setRefreshing(false);
   };

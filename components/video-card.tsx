@@ -1,5 +1,6 @@
 import { icons } from "@/constants";
 import { Videos } from "@/types";
+import { ResizeMode, Video } from "expo-av";
 import { useState } from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 const VideoCard = ({
@@ -40,7 +41,31 @@ const VideoCard = ({
       </View>
 
       {isPlay ? (
-        <Text className="text-white">Playing...</Text>
+        <Video
+          source={{ uri: "https://www.w3schools.com/html/mov_bbb.mp4" }}
+          style={{
+            width: "100%",
+            height: 240,
+            borderRadius: 35,
+          }}
+          resizeMode={ResizeMode.CONTAIN}
+          useNativeControls
+          shouldPlay
+          onPlaybackStatusUpdate={(playbackStatus) => {
+            if (!playbackStatus.isLoaded) {
+              if (playbackStatus.error) {
+                console.log(
+                  `Encountered a fatal error during playback: ${playbackStatus.error}`
+                );
+              }
+            } else {
+              if (playbackStatus.didJustFinish && !playbackStatus.isLooping) {
+                console.log("finished..");
+                setIsPlay(false);
+              }
+            }
+          }}
+        />
       ) : (
         <TouchableOpacity
           activeOpacity={0.7}

@@ -114,3 +114,13 @@ export const getAllVideos = async () => {
 
   return videos.documents;
 }
+
+export const getLatestVideos = async () => {
+  const videos = await databases.listDocuments(
+    databaseId,
+    videoCollectionId,
+    [Query.orderDesc("$createdAt"), Query.limit(7)]
+  )
+
+  return videos.documents;
+}
