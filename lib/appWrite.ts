@@ -124,3 +124,14 @@ export const getLatestVideos = async () => {
 
   return videos.documents;
 }
+
+export const searchVideoTopics = async (query : string) => {
+  const videos = await databases.listDocuments(
+    databaseId,
+    videoCollectionId,
+    [Query.search('title', query)]
+  )
+
+
+  return videos.documents;
+}

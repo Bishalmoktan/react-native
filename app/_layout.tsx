@@ -59,6 +59,12 @@ const RootLayout = () => {
             headerShown: false,
           }}
         ></Stack.Screen>
+        <Stack.Screen
+          name="search/[query]"
+          options={{
+            headerShown: false,
+          }}
+        ></Stack.Screen>
       </Stack>
       <StatusBar backgroundColor="#161622" style="light" />
     </GlobalProvider>

@@ -26,9 +26,7 @@ const Home = () => {
       <FlatList
         data={posts}
         keyExtractor={(item) => item.$id}
-        renderItem={({ item } : {item: Videos}) => (
-         <VideoCard {...item} />
-        )}
+        renderItem={({ item }: { item: Videos }) => <VideoCard {...item} />}
         ListHeaderComponent={() => (
           <View className="px-4 my-6 gap-y-6">
             <View className="flex-row items-start justify-between">
@@ -49,11 +47,7 @@ const Home = () => {
               </View>
             </View>
 
-            <SearchField
-              handleTextChange={() => {}}
-              placeholder="Search for a video topic"
-              value=""
-            />
+            <SearchField />
 
             <View className="w-full pt-6 pb-8">
               <Text className="mb-3 text-lg text-gray-100 font-pregular">
