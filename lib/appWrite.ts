@@ -1,3 +1,4 @@
+import { User } from "@/context/global-context";
 import {
   Account,
   Avatars,
@@ -107,31 +108,45 @@ export const getCurrentUser = async () => {
 };
 
 export const getAllVideos = async () => {
-  const videos = await databases.listDocuments(
-    databaseId,
-    videoCollectionId
-  )
+  const videos = await databases.listDocuments(databaseId, videoCollectionId);
 
   return videos.documents;
-}
+};
 
 export const getLatestVideos = async () => {
-  const videos = await databases.listDocuments(
-    databaseId,
-    videoCollectionId,
-    [Query.orderDesc("$createdAt"), Query.limit(7)]
-  )
+  const videos = await databases.listDocuments(databaseId, videoCollectionId, [
+    Query.orderDesc("$createdAt"),
+    Query.limit(7),
+  ]);
 
   return videos.documents;
-}
+};
 
-export const searchVideoTopics = async (query : string) => {
-  const videos = await databases.listDocuments(
-    databaseId,
-    videoCollectionId,
-    [Query.search('title', query)]
-  )
-
+export const searchVideoTopics = async (query: string) => {
+  const videos = await databases.listDocuments(databaseId, videoCollectionId, [
+    Query.search("title", query),
+  ]);
 
   return videos.documents;
-}
+};
+
+export const getUserVideo = async (user: User) => {
+  const videos = await databases.listDocuments(databaseId, videoCollectionId, [
+    Query.equal("creator", user.$id),
+  ]);
+
+  return videos.documents;
+};
+
+export const signOut = async () => {
+  try {
+    const session = await account.deleteSession("current");
+    return session;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Something went wrong!");
+    }
+  }
+};

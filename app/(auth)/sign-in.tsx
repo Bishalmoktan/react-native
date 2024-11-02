@@ -13,41 +13,42 @@ import FormField from "@/components/form-field";
 import { useState } from "react";
 import CustomButton from "@/components/custom-button";
 import { Link, router } from "expo-router";
-import { signIn } from "@/lib/appWrite";
+import { getCurrentUser, signIn } from "@/lib/appWrite";
+import { useGlobalContext } from "@/context/global-context";
 
 const SignIn = () => {
   const [formState, setFormState] = useState({
     email: "",
     password: "",
   });
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { setCurrentUser, setIsLoggedIn } = useGlobalContext();
 
-    const onSumbit = async () => {
-      if (!formState.email  || !formState.password) {
-        Alert.alert("Error", "Fill all the fields");
-        return;
+  const onSumbit = async () => {
+    if (!formState.email || !formState.password) {
+      Alert.alert("Error", "Fill all the fields");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await signIn(formState.email, formState.password);
+      const user = await getCurrentUser();
+      // @ts-expect-error
+      setCurrentUser(user);
+      setIsLoggedIn(true);
+
+      router.replace("/home");
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        Alert.alert("Error", error.message);
+      } else {
+        Alert.alert("Error", "Something went wrong!");
       }
-      setIsSubmitting(true);
-      try {
-        await signIn(
-          formState.email,
-          formState.password
-        );
-
-        // set global state
-
-        router.replace("/home");
-      } catch (error) {
-        console.log(error);
-        if (error instanceof Error) {
-          Alert.alert("Error", error.message);
-        } else {
-          Alert.alert("Error", "Something went wrong!");
-        }
-      } finally {
-        setIsSubmitting(false);
-      }
-    };
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <SafeAreaView className="h-full bg-primary">

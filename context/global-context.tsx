@@ -9,6 +9,7 @@ import {
 } from "react";
 
 export interface User {
+  $id: string;
   username: string;
   accountId: string;
   email: string;
@@ -37,6 +38,7 @@ const GlobalProvider = ({ children }: { children: ReactNode }) => {
         const res = await getCurrentUser();
 
         const user: User = {
+          $id: res.$id,
           username: res.username,
           accountId: res.accountId,
           email: res.email,

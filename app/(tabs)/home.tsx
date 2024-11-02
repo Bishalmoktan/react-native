@@ -10,10 +10,12 @@ import { getAllVideos } from "@/lib/appWrite";
 import { useAppwrite } from "@/lib/useAppwrite";
 import VideoCard from "@/components/video-card";
 import { Videos } from "@/types";
+import { useGlobalContext } from "@/context/global-context";
 
 const Home = () => {
   const [refreshing, setRefreshing] = useState(false);
   const { data: posts, refetch } = useAppwrite(getAllVideos);
+  const { currentUser } = useGlobalContext();
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -35,7 +37,7 @@ const Home = () => {
                   Welcome back
                 </Text>
                 <Text className="text-2xl text-white font-pregular">
-                  Bishal Moktan
+                  {currentUser?.username}
                 </Text>
               </View>
               <View className="mt-1.5">

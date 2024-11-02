@@ -7,6 +7,7 @@ import CustomButton from "@/components/custom-button";
 import { Link, router } from "expo-router";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import { createUser } from "@/lib/appWrite";
+import { useGlobalContext } from "@/context/global-context";
 
 const SignUp = () => {
   const [formState, setFormState] = useState({
@@ -15,35 +16,41 @@ const SignUp = () => {
     password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { setCurrentUser, setIsLoggedIn } = useGlobalContext();
 
-  const onSumbit =  async () => {
+  const onSumbit = async () => {
     if (!formState.email || !formState.username || !formState.password) {
       Alert.alert("Error", "Fill all the fields");
       return;
     }
     setIsSubmitting(true);
     try {
-      await createUser(formState.username, formState.email, formState.password);
-      
-      // set global state
+      const user = await createUser(
+        formState.username,
+        formState.email,
+        formState.password
+      );
+      // @ts-expect-error
+      setCurrentUser(user);
+      setIsLoggedIn(true);
 
       router.replace("/home");
     } catch (error) {
       console.log(error);
-      if (error instanceof Error) { 
-        Alert.alert("Error", error.message)
+      if (error instanceof Error) {
+        Alert.alert("Error", error.message);
       } else {
-        Alert.alert("Error", "Something went wrong!")
+        Alert.alert("Error", "Something went wrong!");
       }
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <SafeAreaView className="h-full bg-primary">
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"} 
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
         keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
       >
