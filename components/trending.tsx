@@ -49,7 +49,7 @@ const TrendingItem = ({ item, activeItem }: TrendingItemProps) => {
     >
       {play ? (
         <Video
-          source={{ uri: "https://www.w3schools.com/html/mov_bbb.mp4" }}
+          source={{ uri: item.video}}
           style={{
             width: 208,
             height: 288,

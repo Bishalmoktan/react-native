@@ -1,11 +1,15 @@
+import { IForm } from "@/app/(tabs)/create";
 import { User } from "@/context/global-context";
+import { ImagePickerAsset } from "expo-image-picker";
 import {
   Account,
   Avatars,
   Client,
   Databases,
   ID,
+  ImageGravity,
   Query,
+  Storage,
 } from "react-native-appwrite";
 
 export const config = {
@@ -32,6 +36,7 @@ const client = new Client();
 const account = new Account(client);
 const avatars = new Avatars(client);
 const databases = new Databases(client);
+const storage = new Storage(client);
 
 client
   .setEndpoint(config.endpoint)
@@ -132,6 +137,7 @@ export const searchVideoTopics = async (query: string) => {
 
 export const getUserVideo = async (user: User) => {
   const videos = await databases.listDocuments(databaseId, videoCollectionId, [
+    Query.orderDesc("$createdAt"),
     Query.equal("creator", user.$id),
   ]);
 
@@ -150,3 +156,98 @@ export const signOut = async () => {
     }
   }
 };
+
+// Upload File
+export async function uploadFile(file: ImagePickerAsset, type: string) {
+  if (!file) return;
+
+  const asset = {
+    name: file.fileName!,
+    type: file.mimeType!,
+    size: file.fileSize!,
+    uri: file.uri,
+  };
+
+  try {
+    const uploadedFile = await storage.createFile(
+      config.storageId,
+      ID.unique(),
+      asset
+    );
+
+    const fileUrl = await getFilePreview(uploadedFile.$id, type);
+    return fileUrl;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Something went wrong!");
+    }
+  }
+}
+
+// Get File Preview
+export async function getFilePreview(fileId: string, type: string) {
+  let fileUrl;
+
+  try {
+    if (type === "video") {
+      fileUrl = storage.getFileView(config.storageId, fileId);
+    } else if (type === "image") {
+      fileUrl = storage.getFilePreview(
+        config.storageId,
+        fileId,
+        2000,
+        2000,
+        ImageGravity.Top,
+        100
+      );
+    } else {
+      throw new Error("Invalid file type");
+    }
+
+    if (!fileUrl) throw Error;
+
+    return fileUrl;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Something went wrong!");
+    }
+  }
+}
+
+interface CreateVideoPostType extends IForm {
+  userId: string;
+}
+
+// Create Video Post
+export async function createVideoPost(form: CreateVideoPostType) {
+  try {
+    const [thumbnailUrl, videoUrl] = await Promise.all([
+      uploadFile(form.thumbnail!, "image"),
+      uploadFile(form.video!, "video"),
+    ]);
+
+    const newPost = await databases.createDocument(
+      config.databaseId,
+      config.videoCollectionId,
+      ID.unique(),
+      {
+        title: form.title,
+        thumbnail: thumbnailUrl,
+        video: videoUrl,
+        creator: form.userId,
+      }
+    );
+
+    return newPost;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Something went wrong!");
+    }
+  }
+}
